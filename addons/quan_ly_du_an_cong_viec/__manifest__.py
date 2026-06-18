@@ -8,6 +8,7 @@
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'views/ql_du_an_views.xml',
+        'views/ql_du_an_ai_views.xml',
         'views/ql_cong_viec_views.xml',
         'views/ql_canh_bao_cong_viec_views.xml',
         'views/nhan_vien_extend_views.xml',
