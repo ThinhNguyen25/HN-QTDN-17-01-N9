@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ql_du_an,access.ql_du_an,model_ql_du_an,base.group_user,1,1,1,1
 access_ql_cong_viec,access.ql_cong_viec,model_ql_cong_viec,base.group_user,1,1,1,1
+access_ql_canh_bao_cong_viec,access.ql_canh_bao_cong_viec,model_ql_canh_bao_cong_viec,base.group_user,1,1,1,1

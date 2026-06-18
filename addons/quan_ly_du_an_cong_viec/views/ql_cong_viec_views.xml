@@ -12,6 +12,7 @@
                 <field name="trang_thai"/>
                 <field name="tien_do"/>
                 <field name="is_qua_han"/>
+                <field name="so_canh_bao"/>
             </tree>
         </field>
     </record>
@@ -27,8 +28,12 @@
                             type="object"
                             class="btn-primary"
                             attrs="{'invisible': [('trang_thai', '=', 'hoan_thanh')]}"/>
+                    <button name="action_check_overdue_now"
+                            string="Kiểm tra quá hạn"
+                            type="object"
+                            class="btn-secondary"/>
                     <field name="trang_thai" widget="statusbar"
-                           statusbar_visible="chua_lam,dang_lam,cho_duyet,hoan_thanh"/>
+                           statusbar_visible="chua_lam,dang_lam,cho_duyet,qua_han,hoan_thanh"/>
                 </header>
 
                 <sheet>
@@ -42,12 +47,26 @@
                         <field name="muc_uu_tien"/>
                         <field name="tien_do"/>
                         <field name="is_qua_han" readonly="1"/>
+                        <field name="so_canh_bao" readonly="1"/>
                     </group>
 
                     <group string="Nội dung">
                         <field name="mo_ta"/>
                         <field name="ghi_chu"/>
                     </group>
+
+                    <notebook>
+                        <page string="Cảnh báo">
+                            <field name="canh_bao_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="ngay_canh_bao"/>
+                                    <field name="muc_do"/>
+                                    <field name="trang_thai"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

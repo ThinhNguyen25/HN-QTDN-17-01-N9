@@ -14,4 +14,10 @@
               parent="menu_ql_du_an_cong_viec_root"
               action="action_ql_cong_viec"
               sequence="2"/>
+
+    <menuitem id="menu_ql_canh_bao_cong_viec"
+              name="Cảnh báo quá hạn"
+              parent="menu_ql_du_an_cong_viec_root"
+              action="action_ql_canh_bao_cong_viec"
+              sequence="3"/>
 </odoo>

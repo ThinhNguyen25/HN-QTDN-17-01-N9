@@ -1,0 +1,60 @@
+<odoo>
+    <record id="view_ql_canh_bao_cong_viec_tree" model="ir.ui.view">
+        <field name="name">ql_canh_bao_cong_viec.tree</field>
+        <field name="model">ql_canh_bao_cong_viec</field>
+        <field name="arch" type="xml">
+            <tree string="Cảnh báo công việc" decoration-danger="trang_thai == 'mo'">
+                <field name="name"/>
+                <field name="cong_viec_id"/>
+                <field name="du_an_id"/>
+                <field name="nguoi_phu_trach_id"/>
+                <field name="quan_ly_id"/>
+                <field name="loai_canh_bao"/>
+                <field name="muc_do"/>
+                <field name="ngay_canh_bao"/>
+                <field name="trang_thai"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ql_canh_bao_cong_viec_form" model="ir.ui.view">
+        <field name="name">ql_canh_bao_cong_viec.form</field>
+        <field name="model">ql_canh_bao_cong_viec</field>
+        <field name="arch" type="xml">
+            <form string="Cảnh báo công việc">
+                <header>
+                    <button name="action_mark_resolved"
+                            string="Đánh dấu đã xử lý"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('trang_thai', '=', 'da_xu_ly')]}"/>
+                    <field name="trang_thai" widget="statusbar"/>
+                </header>
+
+                <sheet>
+                    <group string="Thông tin cảnh báo">
+                        <field name="name"/>
+                        <field name="cong_viec_id"/>
+                        <field name="du_an_id" readonly="1"/>
+                        <field name="nguoi_phu_trach_id" readonly="1"/>
+                        <field name="quan_ly_id" readonly="1"/>
+                        <field name="loai_canh_bao"/>
+                        <field name="muc_do"/>
+                        <field name="ngay_canh_bao"/>
+                    </group>
+
+                    <group string="Nội dung">
+                        <field name="noi_dung"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ql_canh_bao_cong_viec" model="ir.actions.act_window">
+        <field name="name">Cảnh báo quá hạn</field>
+        <field name="res_model">ql_canh_bao_cong_viec</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('trang_thai', '=', 'mo')]</field>
+    </record>
+</odoo>

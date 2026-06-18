@@ -51,6 +51,17 @@ class QLCongViec(models.Model):
         compute='_compute_is_qua_han'
     )
 
+    canh_bao_ids = fields.One2many(
+        'ql_canh_bao_cong_viec',
+        'cong_viec_id',
+        string='Cảnh báo'
+    )
+
+    so_canh_bao = fields.Integer(
+        string='Số cảnh báo',
+        compute='_compute_so_canh_bao'
+    )
+
     ghi_chu = fields.Text(string='Ghi chú')
 
     @api.depends('deadline', 'trang_thai')
@@ -62,6 +73,11 @@ class QLCongViec(models.Model):
                 and rec.deadline < today
                 and rec.trang_thai not in ['hoan_thanh', 'huy']
             )
+
+    @api.depends('canh_bao_ids', 'canh_bao_ids.trang_thai')
+    def _compute_so_canh_bao(self):
+        for rec in self:
+            rec.so_canh_bao = len(rec.canh_bao_ids.filtered(lambda a: a.trang_thai == 'mo'))
 
     @api.constrains('tien_do')
     def _check_tien_do(self):
@@ -80,3 +96,49 @@ class QLCongViec(models.Model):
             rec.trang_thai = 'hoan_thanh'
             rec.tien_do = 100.0
             rec.ngay_hoan_thanh = fields.Date.today()
+            rec.canh_bao_ids.filtered(lambda a: a.trang_thai == 'mo').write({
+                'trang_thai': 'da_xu_ly'
+            })
+
+    def action_check_overdue_now(self):
+        self._cron_check_overdue_tasks()
+
+    @api.model
+    def _cron_check_overdue_tasks(self):
+        today = fields.Date.today()
+
+        overdue_tasks = self.search([
+            ('deadline', '<', today),
+            ('trang_thai', 'not in', ['hoan_thanh', 'huy']),
+        ])
+
+        Alert = self.env['ql_canh_bao_cong_viec']
+
+        for task in overdue_tasks:
+            task.trang_thai = 'qua_han'
+
+            existed_alert = Alert.search([
+                ('cong_viec_id', '=', task.id),
+                ('loai_canh_bao', '=', 'qua_han'),
+                ('trang_thai', '=', 'mo'),
+            ], limit=1)
+
+            if existed_alert:
+                continue
+
+            Alert.create({
+                'name': 'Công việc quá hạn: %s' % task.ten_cong_viec,
+                'cong_viec_id': task.id,
+                'loai_canh_bao': 'qua_han',
+                'muc_do': 'cao',
+                'ngay_canh_bao': today,
+                'noi_dung': (
+                    'Công việc "%s" thuộc dự án "%s" đã quá hạn. '
+                    'Người phụ trách: %s. Hạn hoàn thành: %s.'
+                ) % (
+                    task.ten_cong_viec,
+                    task.du_an_id.ten_du_an,
+                    task.nguoi_phu_trach_id.display_name,
+                    task.deadline,
+                )
+            })
