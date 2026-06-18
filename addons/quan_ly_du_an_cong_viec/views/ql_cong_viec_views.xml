@@ -1,0 +1,61 @@
+<odoo>
+    <record id="view_ql_cong_viec_tree" model="ir.ui.view">
+        <field name="name">ql_cong_viec.tree</field>
+        <field name="model">ql_cong_viec</field>
+        <field name="arch" type="xml">
+            <tree string="Công việc" decoration-danger="is_qua_han">
+                <field name="ten_cong_viec"/>
+                <field name="du_an_id"/>
+                <field name="nguoi_phu_trach_id"/>
+                <field name="deadline"/>
+                <field name="muc_uu_tien"/>
+                <field name="trang_thai"/>
+                <field name="tien_do"/>
+                <field name="is_qua_han"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ql_cong_viec_form" model="ir.ui.view">
+        <field name="name">ql_cong_viec.form</field>
+        <field name="model">ql_cong_viec</field>
+        <field name="arch" type="xml">
+            <form string="Công việc">
+                <header>
+                    <button name="action_mark_done"
+                            string="Đánh dấu hoàn thành"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('trang_thai', '=', 'hoan_thanh')]}"/>
+                    <field name="trang_thai" widget="statusbar"
+                           statusbar_visible="chua_lam,dang_lam,cho_duyet,hoan_thanh"/>
+                </header>
+
+                <sheet>
+                    <group string="Thông tin công việc">
+                        <field name="ten_cong_viec"/>
+                        <field name="du_an_id"/>
+                        <field name="nguoi_phu_trach_id"/>
+                        <field name="ngay_bat_dau"/>
+                        <field name="deadline"/>
+                        <field name="ngay_hoan_thanh" readonly="1"/>
+                        <field name="muc_uu_tien"/>
+                        <field name="tien_do"/>
+                        <field name="is_qua_han" readonly="1"/>
+                    </group>
+
+                    <group string="Nội dung">
+                        <field name="mo_ta"/>
+                        <field name="ghi_chu"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ql_cong_viec" model="ir.actions.act_window">
+        <field name="name">Công việc</field>
+        <field name="res_model">ql_cong_viec</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

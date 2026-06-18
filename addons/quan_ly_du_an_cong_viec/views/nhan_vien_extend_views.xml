@@ -1,0 +1,50 @@
+<odoo>
+    <record id="view_nhan_vien_form_inherit_du_an_cong_viec" model="ir.ui.view">
+        <field name="name">nhan_vien.form.inherit.du_an_cong_viec</field>
+        <field name="model">nhan_vien</field>
+        <field name="inherit_id" ref="nhan_su.view_nhan_vien_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <div class="oe_button_box" name="button_box_du_an_cong_viec">
+                    <button name="action_open_cong_viec_phu_trach"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-tasks">
+                        <field name="so_cong_viec_phu_trach" widget="statinfo" string="Công việc"/>
+                    </button>
+                </div>
+
+                <notebook>
+                    <page string="Dự án &amp; Công việc">
+                        <group string="Dự án quản lý">
+                            <field name="du_an_quan_ly_ids">
+                                <tree>
+                                    <field name="ma_du_an"/>
+                                    <field name="ten_du_an"/>
+                                    <field name="trang_thai"/>
+                                    <field name="tien_do"/>
+                                </tree>
+                            </field>
+                        </group>
+
+                        <group string="Dự án tham gia">
+                            <field name="du_an_tham_gia_ids" widget="many2many_tags"/>
+                        </group>
+
+                        <group string="Công việc phụ trách">
+                            <field name="cong_viec_phu_trach_ids">
+                                <tree>
+                                    <field name="ten_cong_viec"/>
+                                    <field name="du_an_id"/>
+                                    <field name="deadline"/>
+                                    <field name="trang_thai"/>
+                                    <field name="tien_do"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>
