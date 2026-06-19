@@ -1,117 +1,172 @@
-import os
 import requests
 
 from odoo import models, fields
-from odoo.exceptions import UserError
 
 
 class QLDuAnAI(models.Model):
     _inherit = 'ql_du_an'
 
-    ai_phan_tich = fields.Text(string='AI phân tích dự án')
-    ai_last_generated_at = fields.Datetime(string='Thời điểm AI phân tích gần nhất')
+    ai_phan_tich = fields.Text(string='AI phân tích')
 
-    def _build_ai_prompt(self):
-        self.ensure_one()
+    ai_du_bao = fields.Text(
+        string='AI dự báo'
+    )
 
-        task_lines = []
-        for task in self.cong_viec_ids:
-            task_lines.append(
-                '- {name} | Phụ trách: {owner} | Deadline: {deadline} | '
-                'Trạng thái: {state} | Tiến độ: {progress}% | Ưu tiên: {priority}'.format(
-                    name=task.ten_cong_viec or '',
-                    owner=task.nguoi_phu_trach_id.display_name or '',
-                    deadline=task.deadline or '',
-                    state=task.trang_thai or '',
-                    progress=task.tien_do or 0,
-                    priority=task.muc_uu_tien or '',
-                )
-            )
+    ai_uu_tien = fields.Text(
+        string='AI ưu tiên công việc'
+    )
 
-        if not task_lines:
-            task_lines.append('- Dự án chưa có công việc nào.')
+    ai_nguy_co = fields.Text(
+        string='AI nguy cơ trễ'
+    )
 
-        return """
-Bạn là trợ lý AI hỗ trợ quản lý dự án trong Odoo ERP.
-Hãy phân tích dự án sau bằng tiếng Việt, ngắn gọn, rõ ràng.
-
-THÔNG TIN DỰ ÁN:
-Mã dự án: {ma}
-Tên dự án: {ten}
-Mục tiêu: {muc_tieu}
-Quản lý dự án: {quan_ly}
-Thành viên: {thanh_vien}
-Trạng thái: {trang_thai}
-Tiến độ hệ thống tính: {tien_do}%
-Số công việc: {so_cv}
-Số công việc hoàn thành: {so_done}
-
-DANH SÁCH CÔNG VIỆC:
-{tasks}
-
-Yêu cầu trả lời đúng 3 phần:
-1. TÓM TẮT TIẾN ĐỘ
-2. RỦI RO CHÍNH
-3. GỢI Ý HÀNH ĐỘNG ƯU TIÊN
-""".format(
-            ma=self.ma_du_an or '',
-            ten=self.ten_du_an or '',
-            muc_tieu=self.muc_tieu or '',
-            quan_ly=self.quan_ly_id.display_name or '',
-            thanh_vien=', '.join(self.thanh_vien_ids.mapped('display_name')),
-            trang_thai=self.trang_thai or '',
-            tien_do=self.tien_do or 0,
-            so_cv=self.so_cong_viec or 0,
-            so_done=self.so_cong_viec_hoan_thanh or 0,
-            tasks='\n'.join(task_lines),
-        )
+    ai_bao_cao = fields.Html(
+        string='Báo cáo AI'
+    )
 
     def action_ai_phan_tich_du_an(self):
         self.ensure_one()
 
-        api_key = os.environ.get('OPENAI_API_KEY')
-        if not api_key:
-            raise UserError('Chưa cấu hình OPENAI_API_KEY trong terminal chạy Odoo.')
+        ds_cong_viec = ""
 
-        payload = {
-            'model': os.environ.get('OPENAI_MODEL', 'gpt-4o-mini'),
-            'input': self._build_ai_prompt(),
-        }
+        for cv in self.cong_viec_ids:
+            ds_cong_viec += f"""
+Tên công việc: {cv.ten_cong_viec}
+Trạng thái: {cv.trang_thai}
+Hạn hoàn thành: {cv.deadline}
+--------------------------
+"""
 
-        headers = {
-            'Authorization': 'Bearer %s' % api_key,
-            'Content-Type': 'application/json',
-        }
+        prompt = f"""
+Bạn là chuyên gia quản lý dự án ERP.
 
-        try:
-            response = requests.post(
-                'https://api.openai.com/v1/responses',
-                headers=headers,
-                json=payload,
-                timeout=60
-            )
-        except Exception as exc:
-            raise UserError('Không gọi được AI API: %s' % exc)
+Tên dự án:
+{self.ten_du_an}
 
-        if response.status_code >= 400:
-            raise UserError('AI API lỗi %s: %s' % (response.status_code, response.text[:800]))
+Số lượng công việc:
+{len(self.cong_viec_ids)}
+
+Danh sách công việc:
+
+{ds_cong_viec}
+
+Yêu cầu:
+
+1. Đánh giá tiến độ dự án.
+2. Tính tỷ lệ hoàn thành.
+3. Xác định công việc có nguy cơ chậm.
+4. Phân tích rủi ro.
+5. Đề xuất giải pháp cải thiện.
+6. Đề xuất phân bổ nhân sự.
+7. Xếp hạng mức ưu tiên công việc.
+8. Dự đoán khả năng hoàn thành đúng hạn (%).
+9. Kết luận tổng thể.
+
+Trả lời bằng tiếng Việt.
+"""
+
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "qwen2.5:3b",
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=180
+        )
 
         data = response.json()
-        ai_text = data.get('output_text', '')
 
-        if not ai_text:
-            for item in data.get('output', []):
-                for content in item.get('content', []):
-                    if content.get('text'):
-                        ai_text += content.get('text') + '\n'
+        self.ai_phan_tich = data["response"]
 
-        ai_text = ai_text.strip()
-        if not ai_text:
-            raise UserError('AI API phản hồi nhưng không có nội dung văn bản.')
+        # dự báo
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "qwen2.5:3b",
+                "prompt": f"""
+Hãy dự đoán khả năng hoàn thành dự án {self.ten_du_an}.
 
-        self.write({
-            'ai_phan_tich': ai_text,
-            'ai_last_generated_at': fields.Datetime.now(),
-        })
+Cho biết:
 
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
+- Khả năng thành công (%)
+- Mức độ rủi ro
+- Công việc cần ưu tiên
+- Khuyến nghị quản lý
+
+Dữ liệu:
+
+{ds_cong_viec}
+""",
+                "stream": False
+            }
+        )
+
+        self.ai_du_bao = response.json()["response"]
+
+        # ưu tiên công việc
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "qwen2.5:3b",
+                "prompt": f"""
+Hãy xếp loại từng công việc thành:
+
+- Khẩn cấp
+- Quan trọng
+- Bình thường
+
+Giải thích lý do.
+
+{ds_cong_viec}
+""",
+                "stream": False
+            }
+        )
+
+        self.ai_uu_tien = response.json()["response"]
+
+        # nguy cơ trễ
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "qwen2.5:3b",
+                "prompt": f"""
+Hãy phát hiện các công việc có nguy cơ trễ.
+
+Cho biết:
+
+- Công việc
+- Mức độ nguy hiểm
+- Nguyên nhân
+- Đề xuất
+
+{ds_cong_viec}
+""",
+                "stream": False
+            }
+        )
+
+        self.ai_nguy_co = response.json()["response"]
+
+        # báo cáo html
+        self.ai_bao_cao = f"""
+<h2>Tổng quan dự án</h2>
+
+<h3>Phân tích tiến độ</h3>
+<pre>{self.ai_phan_tich}</pre>
+
+<h3>Dự báo hoàn thành</h3>
+<pre>{self.ai_du_bao}</pre>
+
+<h3>Ưu tiên công việc</h3>
+<pre>{self.ai_uu_tien}</pre>
+
+<h3>Nguy cơ trễ</h3>
+<pre>{self.ai_nguy_co}</pre>
+"""
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload'
+        }

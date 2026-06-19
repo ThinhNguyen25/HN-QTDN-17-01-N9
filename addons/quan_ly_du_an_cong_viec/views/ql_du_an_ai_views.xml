@@ -1,19 +1,55 @@
 <odoo>
-    <record id="view_ql_du_an_form_inherit_ai" model="ir.ui.view">
-        <field name="name">ql_du_an.form.inherit.ai</field>
+    <record id="view_ql_du_an_form_ai" model="ir.ui.view">
+
+        <field name="name">ql.du.an.form.ai</field>
         <field name="model">ql_du_an</field>
-        <field name="inherit_id" ref="quan_ly_du_an_cong_viec.view_ql_du_an_form"/>
+
+        <field name="inherit_id"
+               ref="quan_ly_du_an_cong_viec.view_ql_du_an_form"/>
+
         <field name="arch" type="xml">
+
             <xpath expr="//sheet" position="inside">
-                <group string="AI phân tích dự án">
-                    <button name="action_ai_phan_tich_du_an"
-                            string="AI phân tích dự án"
-                            type="object"
-                            class="btn-primary"/>
-                    <field name="ai_last_generated_at" readonly="1"/>
-                    <field name="ai_phan_tich" readonly="1" nolabel="1"/>
+
+                <group string="AI phân tích">
+
+                    <button
+                        name="action_ai_phan_tich_du_an"
+                        string="AI phân tích dự án"
+                        type="object"
+                        class="btn-primary"/>
+
+                    <field name="ai_phan_tich"/>
+
                 </group>
+
+                <group string="AI dự báo">
+
+                    <field name="ai_du_bao"/>
+
+                </group>
+
+                <group string="AI ưu tiên công việc">
+
+                    <field name="ai_uu_tien"/>
+
+                </group>
+
+                <group string="AI phát hiện nguy cơ">
+
+                    <field name="ai_nguy_co"/>
+
+                </group>
+
+                <group string="Báo cáo AI">
+
+                    <field name="ai_bao_cao"/>
+
+                </group>
+
             </xpath>
+
         </field>
+
     </record>
 </odoo>
