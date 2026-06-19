@@ -178,6 +178,3 @@ Mở trình duyệt và truy cập hệ thống theo đường dẫn: **http://l
 ## 📝 6. License
 
 © 2024 AIoTLab, Faculty of Information Technology, DaiNam University. All rights reserved.
-```
-
-```
