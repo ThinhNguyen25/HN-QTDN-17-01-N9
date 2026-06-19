@@ -22,8 +22,6 @@
 ## 📖 1. Giới thiệu
 Platform ERP được áp dụng vào học phần Thực tập doanh nghiệp dựa trên mã nguồn mở Odoo. 
 
----
-
 ## 🔧 2. Các công nghệ được sử dụng
 <div align="center">
 
@@ -38,17 +36,12 @@ Platform ERP được áp dụng vào học phần Thực tập doanh nghiệp d
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 </div>
 
----
-
 ## 🚀 3. Các project đã thực hiện dựa trên Platform
 
 Một số project sinh viên đã thực hiện:
 - #### [Khoá 15](./docs/projects/K15/README.md)
 - #### [Khoá 16](./docs/projects/K16/README.md)
 - #### [Khoá 17](./docs/projects/K17/README.md)
-
----
-
 ## ⚙️ 4. Hướng dẫn cài đặt và chạy dự án
 
 ### 4.1. Tải Source Code & Tạo môi trường Python
